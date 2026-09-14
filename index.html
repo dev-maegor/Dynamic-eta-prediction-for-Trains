@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rail ETA Intelligence Dashboard</title>
+  <link rel="stylesheet" href="styles.css?v=20260914" />
+</head>
+<body>
+  <div class="dashboard-shell">
+    <aside class="sidebar">
+      <div class="brand-wrap">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" class="logo-svg" aria-label="RailDelay logo">
+            <path d="M3 10h18M5 15h14M8 4h8l-2 6h-4l-2-6zM7 20h10" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <div class="brand-kicker">RAIL ETA</div>
+          <div class="brand-title">Rail ETA Intelligence</div>
+        </div>
+      </div>
+
+      <div class="sidebar-panel">
+        <div class="panel-label">Train selection</div>
+        <div class="control-stack">
+          <label class="control-label" for="trainSelect">Train No.</label>
+          <select id="trainSelect"></select>
+        </div>
+        <div class="control-stack">
+          <label class="control-label" for="modelSelect">Model</label>
+          <select id="modelSelect"></select>
+        </div>
+        <div class="control-stack">
+          <label class="control-label" for="stationSelect">Train is at station</label>
+          <select id="stationSelect"></select>
+        </div>
+        <div class="control-stack">
+          <label class="control-label" for="currentDelayInput">Current delay (minutes)</label>
+          <input id="currentDelayInput" type="number" min="0" max="180" value="0" />
+        </div>
+        <button class="primary-button" id="refreshButton">
+          <span class="button-icon">↻</span>
+          Refresh forecast
+        </button>
+      </div>
+
+      <div class="sidebar-panel train-summary-panel">
+        <div class="panel-label">Selected train</div>
+        <div class="train-summary-card">
+          <div class="train-no-wrap">
+            <span id="trainNoBig" class="train-no-big">12314</span>
+            <span class="train-no-sub">RUNNING</span>
+          </div>
+          <div class="train-meta">
+            <div>
+              <span class="meta-label">Origin</span>
+              <span id="originStation" class="meta-value">NDLS</span>
+            </div>
+            <div>
+              <span class="meta-label">Destination</span>
+              <span id="destinationStation" class="meta-value">SDAH</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-panel">
+        <div class="panel-label">Route</div>
+        <div class="route-summary">
+          <div id="routeName" class="route-name">NDLS → SDAH</div>
+          <div id="routeStations" class="route-stations">8 stations</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="topbar">
+        <div>
+          <div class="breadcrumb">Rail Operations / Live Forecast</div>
+          <h1>Dynamic Train ETA Dashboard</h1>
+        </div>
+        <div class="date-group">
+          <div id="todayDate" class="today-date">2025-09-05</div>
+          <div id="liveStamp" class="live-stamp">LIVE</div>
+        </div>
+      </section>
+
+      <section class="summary-grid" id="summaryGrid">
+        <article class="summary-card">
+          <div class="summary-card-top">
+            <span class="summary-label">Current delay</span>
+            <span class="summary-icon status-good">→</span>
+          </div>
+          <div id="currentDelay" class="summary-value">+4m</div>
+          <div id="currentDelayTrend" class="summary-detail">At current station</div>
+        </article>
+
+        <article class="summary-card">
+          <div class="summary-card-top">
+            <span class="summary-label">Average route delay</span>
+            <span class="summary-icon status-amber">Δ</span>
+          </div>
+          <div id="avgDelay" class="summary-value">+8.7m</div>
+          <div id="avgDelayDetail" class="summary-detail">Across stations</div>
+        </article>
+
+        <article class="summary-card">
+          <div class="summary-card-top">
+            <span class="summary-label">Upcoming delay risk</span>
+            <span class="summary-icon status-red">!</span>
+          </div>
+          <div id="nextRisk" class="summary-value">High</div>
+          <div id="nextRiskDetail" class="summary-detail">2 stations > 20m</div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <section class="panel route-panel">
+          <section class="panel-header">
+            <div>
+              <span class="panel-kicker">Station forecast</span>
+              <h2>Upcoming stations</h2>
+            </div>
+            <span id="modelBadge" class="model-badge">Model 12314</span>
+          </section>
+
+          <div class="table-wrap">
+            <table class="station-table">
+              <thead>
+                <tr>
+                  <th>Station sequence</th>
+                  <th>Station</th>
+                  <th>Scheduled</th>
+                  <th>Predicted delay</th>
+                  <th>ETA</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="stationRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel details-panel">
+          <section class="panel-header compact">
+            <div>
+              <span class="panel-kicker">Prediction details</span>
+              <h2>Forecast profile</h2>
+            </div>
+          </section>
+          <div class="detail-list">
+            <div class="detail-row">
+              <span class="detail-label">Direction</span>
+              <span id="directionText" class="detail-value">NDLS → SDAH</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Current station</span>
+              <span id="currentStationText" class="detail-value">KANPUR CENTRAL</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Live ETA</span>
+              <span id="etaText" class="detail-value">--:--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Station progress</span>
+              <span id="progressText" class="detail-value">1 / 8</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Model source</span>
+              <span id="modelText" class="detail-value">catboost_model_train_12314.cbm</span>
+            </div>
+          </div>
+
+          <section class="risk-bar-wrap">
+            <div class="risk-title">
+              <span>Delay risk index</span>
+              <span id="riskScore" class="risk-score">72%</span>
+            </div>
+            <div class="risk-track">
+              <div id="riskFill" class="risk-fill"></div>
+            </div>
+          </section>
+
+          <section class="timeline-wrap">
+            <div class="timeline-head">
+              <span>Route timeline</span>
+            </div>
+            <div id="timeline" class="timeline"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js?v=20260914"></script>
+</body>
+</html>
+</body>
+</html>

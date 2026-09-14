@@ -1,0 +1,14 @@
+{
+  "name": "rail-eta-intelligence-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rail ETA Intelligence Dashboard for schedule, delay prediction, and ETA monitoring across train routes.",
+  "scripts": {
+    "start": "python -m http.server 8000"
+  },
+  "homepage": "https://github.com/<your-username>/<your-repo>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-username>/<your-repo>.git"
+  }
+}
