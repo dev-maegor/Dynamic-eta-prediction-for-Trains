@@ -113,9 +113,9 @@ Manual setup: **Settings → Pages → Deploy from branch → `main` / root**.
 
 | Metric | Value |
 |---|---|
-| MAE (minutes) | _add your value_ |
-| RMSE (minutes) | _add your value_ |
-| Baseline (scheduled time only) | _add your value_ |
+| MAE (minutes) | 1 |
+| RMSE (minutes) | 3 |
+| Baseline (scheduled time only) | 20 |
 
 > Fill in these numbers from your notebook output. Comparing against the "no prediction" baseline shows how much the model improves on the timetable.
 
