@@ -72,7 +72,7 @@ Dynamic-eta-prediction-for-Trains/
 ├── app.js                              # Dashboard logic and ETA calculation
 ├── styles.css                          # Dashboard styling
 ├── training_cat_boost_lstm_gru.ipynb   # Model training notebook
-├── train_schedule_with_arrival_times (1).csv   # Schedule data
+├── train_schedule_with_arrival_times.csv   # Schedule data
 ├── fffgfggcccgcg_combined.csv          # Combined delay and journey data
 ├── package.json
 └── README.md

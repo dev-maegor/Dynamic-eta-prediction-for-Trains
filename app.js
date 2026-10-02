@@ -74,42 +74,82 @@ function parseLine(line) {
   return values;
 }
 
+async function fetchCsvWithFallback(candidates) {
+  for (const file of candidates) {
+    try {
+      const res = await fetch(file);
+      if (res.ok) {
+        return await res.text();
+      }
+    } catch (_) {
+      // try next candidate
+    }
+  }
+  throw new Error(`Failed to load CSV from candidates: ${candidates.join(', ')}`);
+}
+
 async function loadData() {
-  const journeyCsv = await fetch('fffgfggcccgcg_combined.csv').then(r => r.text());
-  const scheduleCsv = await fetch('train_schedule_with_arrival_times%20%281%29.csv').then(r => r.text());
+  try {
+    const journeyCsv = await fetch('fffgfggcccgcg_combined.csv').then(r => {
+      if (!r.ok) throw new Error(`Failed to load journey data: ${r.status}`);
+      return r.text();
+    });
+    const scheduleCsv = await fetchCsvWithFallback([
+      'train_schedule_with_arrival_times.csv',
+      'train_schedule_with_arrival_time.csv',
+      'train_schedule_with_arrival_times%20.csv',
+      'train_schedule_with_arrival_times .csv',
+      'train_schedule_with_arrival_times%20%281%29.csv',
+      'train_schedule_with_arrival_times (1).csv'
+    ]);
 
-  state.rows = parseCsv(journeyCsv).map(row => ({
-    ...row,
-    train_no: String(row.train_no || row.journey_id || '').trim(),
-    station_sequence: Number(row.station_sequence || 0),
-    station_code: String(row.station_code || '').trim(),
-    station_name: String(row.station_name || '').trim(),
-    delay: toNumber(row.delay),
-    delay_change: toNumber(row.delay_change)
-  }));
+  state.rows = parseCsv(journeyCsv).map(row => {
+    let train = String(row.train_no || row.journey_id || '').trim();
+    if (train === '12952') train = '22487';
+    return {
+      ...row,
+      train_no: train,
+      station_sequence: Number(row.station_sequence || 0),
+      station_code: String(row.station_code || '').trim(),
+      station_name: String(row.station_name || '').trim(),
+      delay: toNumber(row.delay),
+      delay_change: toNumber(row.delay_change)
+    };
+  });
 
-  state.scheduleRows = parseCsv(scheduleCsv).map(row => ({
-    ...row,
-    train_no: String(row.train_no || row.journey_id || '').trim(),
-    route_id: String(row.route_id || '').trim(),
-    station_sequence: Number(row.station_sequence || 0),
-    station_code: String(row.station_code || '').trim(),
-    station_name: String(row.station_name || '').trim(),
-    scheduled_arrival_time: String(row['Scheduled arrival time'] || row['Scheduled arrival time'] || '').trim()
-  }));
+  state.scheduleRows = parseCsv(scheduleCsv).map(row => {
+    let train = String(row.train_no || row.journey_id || '').trim();
+    if (train === '12952') train = '22487';
+    return {
+      ...row,
+      train_no: train,
+      route_id: String(row.route_id || '').trim(),
+      station_sequence: Number(row.station_sequence || 0),
+      station_code: String(row.station_code || '').trim(),
+      station_name: String(row.station_name || '').trim(),
+      scheduled_arrival_time: String(row['Scheduled arrival time'] || '').trim()
+    };
+  });
 
   // Resolve schedule rows whose key is stored as a blank voyage id in the CSV and the train number is in the second column.
   state.scheduleRows = state.scheduleRows.map(row => {
     if (!row.train_no && row.journey_id) {
-      row.train_no = normalizeTrainFromJourney(row.journey_id);
+      let t = normalizeTrainFromJourney(row.journey_id);
+      row.train_no = (t === '12952' ? '22487' : t);
     }
     return row;
   });
 
-  state.trainCodes = Array.from(new Set(state.rows.map(r => r.train_no))).sort();
+  state.trainCodes = Array.from(new Set([
+    ...state.scheduleRows.map(r => r.train_no),
+    ...state.rows.map(r => r.train_no)
+  ])).filter(Boolean).filter(t => t !== '12952').sort();
   populateTrainSelect();
   populateModelSelect();
   initializeDashboard();
+  } catch (err) {
+    console.error('Failed to initialize dashboard:', err);
+  }
 }
 
 function normalizeTrainFromJourney(journey) {
@@ -133,6 +173,7 @@ function populateTrainSelect() {
 }
 
 function populateModelSelect() {
+  if (!modelSelect) return;
   modelSelect.innerHTML = '';
   Object.keys(modelPaths).forEach(train => {
     const option = document.createElement('option');
@@ -158,11 +199,17 @@ function populateStationSelect(route) {
 
 function initializeDashboard() {
   trainSelect.value = String(state.selectedTrain);
-  modelSelect.value = String(state.selectedTrain);
+  state.selectedModel = String(state.selectedTrain);
+  if (modelSelect) {
+    modelSelect.value = String(state.selectedTrain);
+  }
 
   trainSelect.onchange = () => {
     state.selectedTrain = String(trainSelect.value);
-    modelSelect.value = state.selectedTrain;
+    state.selectedModel = state.selectedTrain;
+    if (modelSelect) {
+      modelSelect.value = state.selectedTrain;
+    }
     const route = state.scheduleRows.filter(row => String(row.train_no) === String(state.selectedTrain))
       .sort((a, b) => a.station_sequence - b.station_sequence);
     populateStationSelect(route);
@@ -170,10 +217,12 @@ function initializeDashboard() {
     buildDashboard();
   };
 
-  modelSelect.onchange = () => {
-    state.selectedModel = String(modelSelect.value);
-    buildDashboard();
-  };
+  if (modelSelect) {
+    modelSelect.onchange = () => {
+      state.selectedModel = String(modelSelect.value);
+      buildDashboard();
+    };
+  }
 
   stationSelect.onchange = () => {
     buildDashboard();
