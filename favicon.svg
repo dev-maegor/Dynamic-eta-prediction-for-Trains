@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="trainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9bd7ff" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#162338" />
+      <stop offset="100%" stop-color="#07151e" />
+    </linearGradient>
+  </defs>
+  <!-- Background rounded card -->
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)" stroke="#2a405c" stroke-width="2" />
+  
+  <!-- Rails track -->
+  <line x1="10" y1="56" x2="54" y2="56" stroke="#486581" stroke-width="3" stroke-linecap="round" />
+  <line x1="18" y1="50" x2="14" y2="56" stroke="#71bdf5" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="46" y1="50" x2="50" y2="56" stroke="#71bdf5" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="26" y1="53" x2="24" y2="56" stroke="#486581" stroke-width="2" stroke-linecap="round" />
+  <line x1="38" y1="53" x2="40" y2="56" stroke="#486581" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Train body -->
+  <path d="M19 14 C19 9 24 7 32 7 C40 7 45 9 45 14 L45 42 C45 46 42 48 38 48 L26 48 C22 48 19 46 19 42 Z" fill="url(#trainGrad)" />
+
+  <!-- Windshield / Window -->
+  <path d="M23 15 C23 13 26 12 32 12 C38 12 41 13 41 15 L41 26 C41 27 39 28 37 28 L27 28 C25 28 23 27 23 26 Z" fill="#07151e" />
+
+  <!-- Center divider in window -->
+  <line x1="32" y1="12" x2="32" y2="28" stroke="#3b82f6" stroke-width="1.5" />
+
+  <!-- Headlights with glow -->
+  <circle cx="25" cy="38" r="3.5" fill="#ffd192" />
+  <circle cx="39" cy="38" r="3.5" fill="#ffd192" />
+
+  <!-- Front grill / bumper -->
+  <line x1="28" y1="43" x2="36" y2="43" stroke="#eef7f8" stroke-width="2" stroke-linecap="round" />
+  <circle cx="32" cy="34" r="1.5" fill="#eef7f8" />
+</svg>

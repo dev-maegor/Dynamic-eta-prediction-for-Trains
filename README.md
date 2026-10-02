@@ -71,6 +71,8 @@ Dynamic-eta-prediction-for-Trains/
 ├── index.html                          # Dashboard page
 ├── app.js                              # Dashboard logic and ETA calculation
 ├── styles.css                          # Dashboard styling
+├── favicon.svg                         # Website icon
+├── favicon.ico                         # Fallback icon
 ├── training_cat_boost_lstm_gru.ipynb   # Model training notebook
 ├── train_schedule_with_arrival_times.csv   # Schedule data
 ├── fffgfggcccgcg_combined.csv          # Combined delay and journey data
